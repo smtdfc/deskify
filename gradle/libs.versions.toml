@@ -1,0 +1,45 @@
+[versions]
+# --- Build toolchain -----------------------------------------------------
+# AGP 9.5.0 is the current stable line (October 2026). It supports
+# compileSdk up to 37 and requires Gradle >= 9.6.
+# AGP 9.x requires Java 17+ to run (11 in the 8.x line, 17+ from 9.0).
+# Kotlin 2.4.x is the stable pair for AGP 9.5 (Compose compiler is now
+# bundled with Kotlin itself - no separate compose-compiler version pin
+# beyond the Kotlin plugin is required, but we still pin it for clarity).
+agp = "9.5.0"
+kotlin = "2.4.0"
+composeCompiler = "2.4.0"
+
+# --- AndroidX / Jetpack ---------------------------------------------------
+# Pinned to the latest stable lines as of November 2026.
+androidxActivityCompose = "1.10.1"
+androidxCoreKtx = "1.16.0"
+androidxComposeBom = "2025.06.01"
+androidxLifecycleRuntimeKtx = "2.9.1"
+androidxLifecycleProcess = "2.9.1"
+
+# --- Testing --------------------------------------------------------------
+junit4 = "4.13.2"
+androidxTestExt = "1.3.0"
+espresso = "3.7.0"
+robolectric = "4.16.1"
+
+[libraries]
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivityCompose" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCoreKtx" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycleRuntimeKtx" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidxLifecycleProcess" }
+junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExt" }
+androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Deskify launcher manifest.
+
+  Intent-filter strategy:
+  - MainActivity carries HOME + DEFAULT so it can be set as the launcher
+    on the *primary* display (used for the diagnostics / settings UI and
+    for the "phone-as-touchpad" mode).
+  - SecondaryDisplayActivity carries HOME + SECONDARY_HOME so that when
+    the system picks a launcher for the *external* display, this app is
+    eligible. The SECONDARY_HOME category is the API-24+ mechanism that
+    lets a single app be the launcher on a secondary display while a
+    different launcher (or the system's) remains the primary launcher.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:targetApi="36">
+
+    <!-- ==================================================================
+         Permissions
+         ==================================================================
+         Each permission is justified below. The app *asks* for none of
+         them at runtime except the implicit "read your own settings"
+         path - they are all declared for the system to honour on grant.
+    -->
+
+    <!-- Required to set Settings.Global rows (freeform / desktop mode
+         toggles). Granted once via:
+           adb shell pm grant com.smtdfc.deskify android.permission.WRITE_SECURE_SETTINGS
+         The app detects grant state with
+         ContextCompat.checkSelfPermission(...). -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Allows the foreground service to keep the display-listener alive
+         while the launcher is running on the secondary display. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- Required to read the battery level for the taskbar tray. -->
+    <uses-permission android:name="android.permission.BATTERY_STATUS" />
+
+    <!-- Required to read the Wi-Fi state for the taskbar tray. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- Required to read the volume state for the taskbar tray. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATIONS" />
+
+    <!-- Required to show the foreground-service notification on Android 14+. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- ==================================================================
+         Hardware features (all optional - the app degrades gracefully)
+         ================================================================== -->
+    <uses-feature
+        android:name="android.hardware.type.watch"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wireless.display"
+        android:required="false" />
+
+    <application
+        android:name=".DeskifyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Deskify"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        tools:ignore="MissingApplicationIcon">
+
+        <!-- ==================================================================
+             MainActivity - diagnostics + settings + phone-as-touchpad
+             ==================================================================
+             Declared as a HOME launcher so the app is eligible to be set
+             as the *default* launcher. This is intentional: a desktop
+             launcher must be able to take over the home screen when the
+             user wants it to. The "phone-as-touchpad" mode re-uses this
+             activity on the primary display and shows a remote-control
+             UI instead of a regular launcher.
+        -->
+        <activity
+            android:name=".feature.diagnostics.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|keyboard|keyboardHidden|navigation">
+
+            <!-- HOME + DEFAULT: lets the user set Deskify as the
+                 launcher on the primary display. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- A launcher activity that wants to stay on top of the
+                 notification shade uses this optional category. It is
+                 *not* required but improves the UX when the user
+                 swipes down from the top of the home screen. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ==================================================================
+             DesktopActivity - the desktop launcher on the external
+             display (the "SecondaryDisplayActivity" of the design).
+             ==================================================================
+             The SECONDARY_HOME category is what makes this activity
+             eligible to be the launcher on a *secondary* display. On
+             API 24+, the system will route the secondary display's
+             HOME intent to an activity that advertises SECONDARY_HOME,
+             and that activity receives `onCreate` with the secondary
+             display as its default display.
+        -->
+        <activity
+            android:name=".desktop.DesktopActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboard|keyboardHidden|navigation|density"
+            android:windowSoftInputMode="adjustResize"
+            android:excludeFromRecents="false">
+
+            <!-- HOME + SECONDARY_HOME: the system routes the secondary
+                 display's HOME intent here. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.SECONDARY_HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Also advertise as a LAUNCHER so the user can launch
+                 it manually from the app drawer if they want. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ==================================================================
+             DeskifyDisplayService - keeps the display-attached state
+             current and starts/stops the secondary launcher.
+             ==================================================================
+             The service is started by the app on first launch and on
+             every DisplayListener connect/disconnect event. It is a
+             FOREGROUND service so the system does not kill it when
+             the app is backgrounded.
+        -->
+        <service
+            android:name=".service.DeskifyDisplayService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- ==================================================================
+             DisplayChangeReceiver - reacts to the system's
+             DISPLAY_ADDED / DISPLAY_REMOVED / DISPLAY_CHANGED broadcasts.
+             ==================================================================
+             Android 13+ no longer delivers the old ACTION_USB_ACCESSORY
+             / ACTION_HEADSET_PLUG broadcasts to apps. The new,
+             reliable mechanism is DisplayManager.DisplayListener,
+             which we use from the service. This receiver is kept for
+             the legacy ACTION_DISPLAY_* path that still works on
+             Android 9-12.
+        -->
+        <receiver
+            android:name=".service.DisplayChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.DISPLAY_ADDED" />
+                <action android:name="android.intent.action.DISPLAY_REMOVED" />
+                <action android:name="android.intent.action.DISPLAY_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

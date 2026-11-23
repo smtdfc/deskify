@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Deskify app theme.
+
+      We inherit from Material3 DayNight so the diagnostics / setup
+      screens follow the system light/dark preference. The desktop
+      activity (on the external display) uses a *separate* theme that
+      forces a dark background - a desktop looks better dark, and it
+      matches the Windows/Mac aesthetic the user is mimicking.
+    -->
+    <!--
+      Deskify app theme.
+
+      We inherit from the platform's Material Light theme (available on
+      API 28+ without a separate material dependency). The Compose
+      Material3 UI provides the actual material styling; this XML theme
+      only controls the activity-level chrome (status bar, nav bar,
+      window background).
+    -->
+    <style name="Theme.Deskify" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/background_light</item>
+    </style>
+
+    <!-- Desktop theme: forced dark, no status bar, no nav bar. The
+         taskbar at the bottom of the screen provides all the chrome. -->
+    <style name="Theme.Deskify.Desktop" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <color name="deskify_primary">#3B7BF6</color>
+    <color name="deskify_on_primary">#FFFFFF</color>
+
+    <!-- Desktop UI palette -->
+    <color name="deskify_desktop_bg">#0B0F1A</color>
+    <color name="deskify_taskbar">#11151F</color>
+    <color name="deskify_window_bg">#1A1F2E</color>
+    <color name="deskify_window_titlebar">#232936</color>
+    <color name="deskify_accent">#3B7BF6</color>
+    <color name="deskify_accent_on">#FFFFFF</color>
+    <color name="deskify_hover">#2A3140</color>
+    <color name="deskify_selected">#3B4258</color>
+    <color name="deskify_text_primary">#E8EAF0</color>
+    <color name="deskify_text_secondary">#8A92A6</color>
+    <color name="deskify_success">#2EA86B</color>
+    <color name="deskify_warning">#C98B2B</color>
+    <color name="deskify_error">#C94B4B</color>
+</resources>

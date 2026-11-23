@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Deskify</string>
+
+    <!-- Diagnostics screen -->
+    <string name="diagnostics_title">Deskify Diagnostics</string>
+    <string name="diagnostics_recheck">Recheck</string>
+    <string name="diagnostics_verdict_supported">SUPPORTED</string>
+    <string name="diagnostics_verdict_partial">PARTIALLY SUPPORTED</string>
+    <string name="diagnostics_verdict_unsupported">UNSUPPORTED</string>
+    <string name="diagnostics_check_passed">Passed</string>
+    <string name="diagnostics_check_failed">Failed</string>
+    <string name="diagnostics_check_unavailable">Not applicable on this Android version</string>
+    <string name="diagnostics_check_detail">Details</string>
+
+    <!-- Setup screen -->
+    <string name="setup_title">Grant WRITE_SECURE_SETTINGS</string>
+    <string name="setup_command_hint">Copy this command and run it on your PC:</string>
+    <string name="setup_grant_command">adb shell pm grant %1$s android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="setup_recheck">Recheck</string>
+    <string name="setup_skip">Skip for now</string>
+
+    <!-- Phone-as-touchpad screen -->
+    <string name="touchpad_title">Phone as touchpad</string>
+    <string name="touchpad_exit">Exit</string>
+    <string name="touchpad_hint">Drag to move the mouse pointer on the external display. Tap to click. Two-finger tap to right-click. Swipe up/down to scroll.</string>
+
+    <!-- Desktop screen (on the external display) -->
+    <string name="desktop_title">Deskify Desktop</string>
+    <string name="desktop_start">Start</string>
+    <string name="desktop_search_apps">Search apps…</string>
+    <string name="desktop_category_recent">Recent</string>
+    <string name="desktop_category_all">All apps</string>
+    <string name="desktop_close">Close</string>
+    <string name="desktop_minimize">Minimize</string>
+    <string name="desktop_maximize">Maximize</string>
+    <string name="desktop_snap_left">Snap left</string>
+    <string name="desktop_snap_right">Snap right</string>
+    <string name="desktop_revert_settings">Revert Deskify settings</string>
+    <string name="desktop_open_diagnostics">Open diagnostics</string>
+</resources>

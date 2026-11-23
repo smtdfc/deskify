@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Data-include rules for Android's auto-backup.
+  We back up the DataStore files that hold the desktop layout and
+  settings so a factory-reset on the *phone* does not wipe the user's
+  desktop configuration. The external display itself has no storage,
+  so this only matters for the primary-display state.
+-->
+<full-backup-content>
+    <include domain="file" path="datastore/" />
+    <include domain="database" path="deskify.db" />
+</full-backup-content>
